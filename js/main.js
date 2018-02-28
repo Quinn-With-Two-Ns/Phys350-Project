@@ -12,44 +12,15 @@ var worldWidth = 124, worldDepth = 124;
 
 var clock = new THREE.Clock();
 
-function set_vertex( vertices, x, y, val){
-    vertices[ (worldWidth+1)*y + x ].y = val;
-}
-
-function at(vertices, x, y){
-    return (vertices[ (worldWidth+1)*y + x ]).y;
-}
-
-function createArray(length) {
-    var arr = new Array(length || 0),
-        i = length;
-
-    if (arguments.length > 1) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        while(i--) arr[length-1 - i] = createArray.apply(this, args);
-    }
-
-    return arr;
-}
-
-function set_heights(heights, verticies)
-{
-    for(var iy = 0; iy < worldDepth; iy++){
-        for(var ix = 0; ix < worldDepth; ix++){
-            set_vertex(verticies, ix, iy, height_field[iy][ix]);
-        }
-    }
-}
 velocity_field = createArray(worldWidth, worldDepth);
 height_field = createArray(worldWidth, worldDepth);
 
+// Initial Conditions for the Height/Velocity Map
 function init_conditions(heights, velocities){
     // Zeros everything
-    for(var iy = 0; iy < worldDepth; iy++){
-        for(var ix = 0; ix < worldDepth; ix++){
-            velocities[iy][ix] = 0.0;
-            height_field[iy][ix] = 0.0;
-        }
+    for(var iy = 0; iy < heights.length; iy++){
+        velocities[iy].fill(0.0);
+        height_field[iy].fill(0.0);
     }
     // Make a lil bump
     height_field[50][50] = 50;
@@ -63,21 +34,21 @@ function init_conditions(heights, velocities){
 // Given A height map and velocities updates the simulation
 function simulation_step(heights, velocities , dt)
 {
-    var new_heights = createArray(worldWidth, worldDepth);
+    var new_heights = createArray(heights.length, heights.length);
     h = 1000/worldWidth;
     var f;
     // For now I just fixed the boundries to be constant
     // Does some laplacian crap
-    for(var iy = 1; iy < worldDepth-1; iy++){
-        for(var ix = 1; ix < worldDepth-1; ix++){
+    for(var iy = 1; iy < heights.length-1; iy++){
+        for(var ix = 1; ix < heights.length-1; ix++){
             f = (1000)*( heights[iy][ix+1] + heights[iy][ix-1] + heights[iy+1][ix] + heights[iy-1][ix] - 4*heights[iy][ix])/(h*h);
             velocities[iy][ix] = velocities[iy][ix] + f*dt;
             new_heights[iy][ix] = heights[iy][ix] +  velocities[iy][ix]*dt;
         }
     }
     // Update the height map with new heights
-    for(var iy = 1; iy < worldDepth-1; iy++){
-        for(var ix = 1; ix < worldDepth-1; ix++){
+    for(var iy = 1; iy < heights.length-1; iy++){
+        for(var ix = 1; ix < heights.length-1; ix++){
             heights[iy][ix] =  new_heights[iy][ix];
         }
     }
