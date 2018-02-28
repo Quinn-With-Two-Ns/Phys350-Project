@@ -1,5 +1,6 @@
-
-
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+var container;
+var stats;
 var scene;
 var camera;
 var renderer;
@@ -87,6 +88,11 @@ function init(){
     //
     init_conditions(height_field, velocity_field);
     //
+    container = document.createElement( 'div' );
+    document.body.appendChild( container );
+    stats = new Stats();
+    container.appendChild( stats.dom );
+    //
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xffffff );
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
@@ -131,9 +137,8 @@ function onWindowResize() {
 
 // Renders the water
 function render(){
-    // Only update when the window is in focus
-    var delta = clock.getDelta(),
-    time = clock.getElapsedTime() * 10;
+    // Only update when the window is in focus (Dosn't Work)
+    var delta = clock.getDelta();
     if(document.visibilityState == "visible"){
         simulation_step(height_field, velocity_field, delta); // Performs a update of the simulation
     }
@@ -147,6 +152,7 @@ function render(){
 function animate (){
     requestAnimationFrame( animate ); // Keeps re-running this function
     render();
+    stats.update();
 };
 
 
