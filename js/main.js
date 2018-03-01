@@ -14,6 +14,9 @@ var worldWidth = 124;
 var surface_width = 1000;
 var clock = new THREE.Clock();
 
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
 velocity_field = createArray(worldWidth, worldWidth);
 height_field = createArray(worldWidth, worldWidth);
 
@@ -97,7 +100,7 @@ function init(){
 
     camera.position.z = 5;
     window.addEventListener( 'resize', onWindowResize, false );
-
+    window.addEventListener( 'click', onDocumentMouseDown, false );
 
     
 }
@@ -109,6 +112,28 @@ function onWindowResize() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls.handleResize();
 }
+// Handles Mouse Click
+function onDocumentMouseDown( event ) { 
+    
+    // calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    raycaster.setFromCamera( mouse, camera );
+    //
+    var intersect_data = raycaster.intersectObject(mesh, false);
+    if(intersect_data.length > 0){
+        var face_hit = intersect_data[0].face;
+        var vert_index = [face_hit.a, face_hit.b, face_hit.c];
+        for(var i = 0; i < 3; i++){
+            iy = Math.floor(vert_index[i] / (height_field.length+1));
+            ix = vert_index[i] - (height_field.length+1)*iy;
+            height_field[iy][ix] += 50;
+        }
+    }
+}
+
+
 
 // Renders the water
 function render(){
