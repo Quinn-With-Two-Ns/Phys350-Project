@@ -42,7 +42,7 @@ function simulation_step(heights, velocities , dt)
     // For now I just fixed the boundries to be constant
     // Does some laplacian crap
     for(var iy = 1; iy < heights.length-1; iy++){
-        for(var ix = 1; ix < heights.length-1; ix++){
+        for(var ix = 1; ix < heights[0].length-1; ix++){
             f = (1000)*( heights[iy][ix+1] + heights[iy][ix-1] + heights[iy+1][ix] + heights[iy-1][ix] - 4*heights[iy][ix])/(h*h);
             velocities[iy][ix] = velocities[iy][ix] + f*dt;
             new_heights[iy][ix] = heights[iy][ix] +  velocities[iy][ix]*dt;
@@ -50,7 +50,7 @@ function simulation_step(heights, velocities , dt)
     }
     // Update the height map with new heights
     for(var iy = 1; iy < heights.length-1; iy++){
-        for(var ix = 1; ix < heights.length-1; ix++){
+        for(var ix = 1; ix < heights[0].length-1; ix++){
             heights[iy][ix] =  new_heights[iy][ix];
         }
     }
@@ -97,11 +97,8 @@ function init(){
     //
     //create_container(surface_width, 100, scene)
 
-
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseDown, false );
-
-    
 }
 
 // Handles Window resizing
@@ -119,10 +116,11 @@ function onDocumentMouseDown( event ) {
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     raycaster.setFromCamera( mouse, camera );
-    //
+    // Look where the mouse clicked and pull up the first face that intersects with the mouse
     var intersect_data = raycaster.intersectObject(water_mesh, false);
+    // See if we clicked on anything
     if(intersect_data.length > 0){
-        var face_hit = intersect_data[0].face;
+        var face_hit = intersect_data[0].face; // just look at the first face clicked on
         var vert_index = [face_hit.a, face_hit.b, face_hit.c];
         for(var i = 0; i < 3; i++){
             iy = Math.floor(vert_index[i] / (height_field.length+1));
@@ -141,8 +139,8 @@ function render(){
     if(document.visibilityState == "visible"){
         simulation_step(height_field, velocity_field, delta); // Performs a update of the simulation
     }
-    set_heights(height_field, water_mesh.geometry.vertices);
-    water_mesh.geometry.verticesNeedUpdate = true;
+    set_heights(height_field, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
+    water_mesh.geometry.verticesNeedUpdate = true; // Make sure Three.js know we changed the mesh
     controls.update( delta );
     renderer.render(scene, camera);
 }
