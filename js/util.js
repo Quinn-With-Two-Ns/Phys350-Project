@@ -26,3 +26,15 @@ function set_heights(heights, verticies)
         }
     }
 }
+
+
+function create_container(width, depth, scene)
+{
+    var bottom = new THREE.PlaneGeometry( width, width);
+    bottom.rotateX( - Math.PI / 2 );
+    bottom.translate(0, -depth, 0);
+    var mat = new THREE.MeshBasicMaterial( { color: 0x0ff000 } );
+    var mesh = new THREE.Mesh( bottom, mat );
+    scene.add(mesh);
+    return mesh;
+}

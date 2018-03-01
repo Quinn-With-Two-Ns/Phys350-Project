@@ -1,5 +1,7 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
 var container;
+var tub_mesh;
 var stats;
 var scene;
 var camera;
@@ -8,12 +10,12 @@ var material;
 var mesh;
 var geometry;
 
-var worldWidth = 124, worldDepth = 124;
-
+var worldWidth = 124;
+var surface_width = 1000;
 var clock = new THREE.Clock();
 
-velocity_field = createArray(worldWidth, worldDepth);
-height_field = createArray(worldWidth, worldDepth);
+velocity_field = createArray(worldWidth, worldWidth);
+height_field = createArray(worldWidth, worldWidth);
 
 // Initial Conditions for the Height/Velocity Map
 function init_conditions(heights, velocities){
@@ -35,7 +37,7 @@ function init_conditions(heights, velocities){
 function simulation_step(heights, velocities , dt)
 {
     var new_heights = createArray(heights.length, heights.length);
-    h = 1000/worldWidth;
+    h = surface_width/worldWidth;
     var f;
     // For now I just fixed the boundries to be constant
     // Does some laplacian crap
@@ -78,7 +80,7 @@ function init(){
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
     
-    geometry = new THREE.PlaneGeometry( 1000, 1000, worldWidth, worldDepth );
+    geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
     geometry.rotateX( - Math.PI / 2 );
 
     set_heights(height_field, geometry.vertices);
@@ -90,7 +92,9 @@ function init(){
     material = new THREE.MeshBasicMaterial( { color: 0x0000ff, map: texture } );
     mesh = new THREE.Mesh( geometry, material );
     scene.add( mesh );
-    
+    //
+    //create_container(surface_width, 100, scene)
+
     camera.position.z = 5;
     window.addEventListener( 'resize', onWindowResize, false );
 
