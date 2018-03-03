@@ -6,6 +6,7 @@ var scene;
 var camera;
 var renderer;
 var water_mesh;
+var isPlay;
 
 var worldWidth = 124;
 var surface_width = 1000;
@@ -58,6 +59,7 @@ function simulation_step(heights, velocities , dt)
 
 // Sets up the Simulation
 function init(){
+    isPlay = true;
     // 
     init_conditions(height_field, velocity_field);
     //
@@ -99,6 +101,16 @@ function init(){
 
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseDown, false );
+    window.addEventListener( 'blur', onBlur, false );
+    window.addEventListener( 'focus', onFocus, false );
+    
+}
+function onFocus(){
+    isPlay = true;
+    clock.getDelta();
+}
+function onBlur(){
+    isPlay = false;
 }
 
 // Handles Window resizing
@@ -134,6 +146,7 @@ function onDocumentMouseDown( event ) {
 
 // Renders the water
 function render(){
+    if(!isPlay) return;
     // Only update when the window is in focus (Dosn't Work)
     var delta = clock.getDelta();
     if(document.visibilityState == "visible"){
