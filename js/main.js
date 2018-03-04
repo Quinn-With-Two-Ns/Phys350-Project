@@ -1,6 +1,7 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage(); // Make sure the browser supports WebGL
 
 var container;
+var controls;
 var stats;
 var scene;
 var camera;
