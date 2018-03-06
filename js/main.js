@@ -81,8 +81,14 @@ function init(){
     window.addEventListener( 'click', onDocumentMouseDown, false );
     window.addEventListener( 'blur', onBlur, false );
     window.addEventListener( 'focus', onFocus, false );
-    
+    window.addEventListener('keydown', function(event) {
+        if(event.keyCode == 27){ //escape button
+            isPlay = !isPlay;
+            clock.getDelta();
+        }
+    }, false);
 }
+
 function onFocus(){
     isPlay = true;
     clock.getDelta();
