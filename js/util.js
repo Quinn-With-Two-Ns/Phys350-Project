@@ -18,11 +18,11 @@ function createArray(length) {
     return arr;
 }
 
-function set_heights(heights, verticies)
+function set_heights(fluid_map, verticies)
 {
-    for(var iy = 0; iy < heights.length; iy++){
-        for(var ix = 0; ix < heights.length; ix++){
-            set_vertex(verticies, ix, iy, height_field[iy][ix]);
+    for(var iy = 0; iy < fluid_map.ny ; iy++){
+        for(var ix = 0; ix < fluid_map.nx ; ix++){
+            set_vertex(verticies, ix, iy, fluid_map.height(ix,iy));
         }
     }
 }
