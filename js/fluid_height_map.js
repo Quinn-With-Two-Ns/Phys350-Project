@@ -1,6 +1,7 @@
 class Fluid_Height_Map{
     constructor( width, length, nx, ny, initial_conditions){
         this.width = width;
+        this.length = length;
 
         this.nx = nx;
         this.ny = ny;
@@ -17,12 +18,13 @@ class Fluid_Height_Map{
     update( dt ){
         let new_heights = createArray(this.ny, this.nx);
         let dx = this.width/this.nx; 
+        let dy = this.length/this.ny; 
         var f;
         // For now I just fixed the boundries to be constant
         // Does some laplacian crap
         for(var iy = 1; iy < this.ny - 1; iy++){
             for(var ix = 1; ix < this.nx - 1; ix++){
-                f = (this.speed)*( this.height_field[iy][ix+1] + this.height_field[iy][ix-1] + this.height_field[iy+1][ix] + this.height_field[iy-1][ix] - 4*this.height_field[iy][ix])/(dx*dx);
+                f = (this.speed)*( this.height_field[iy][ix+1] + this.height_field[iy][ix-1] + this.height_field[iy+1][ix] + this.height_field[iy-1][ix] - 4*this.height_field[iy][ix])/(dx*dy);
                 this.velocity_field[iy][ix] = this.velocity_field[iy][ix] + f*dt;
                 new_heights[iy][ix] = this.height_field[iy][ix] +  this.velocity_field[iy][ix]*dt;
             }
