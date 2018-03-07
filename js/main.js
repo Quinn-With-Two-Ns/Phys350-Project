@@ -1,5 +1,8 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage(); // Make sure the browser supports WebGL
 
+let blocker = document.getElementById( 'blocker' );
+let instructions = document.getElementById( 'pause' );
+
 var container;
 var controls;
 var stats;
@@ -58,8 +61,7 @@ function init(){
     // 
     fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions);
     //
-    container = document.createElement( 'div' );
-    document.body.appendChild( container );
+    container = document.getElementById( 'container' );
     stats = new Stats(); // Gives the framerate in the top corner 
     container.appendChild( stats.dom );
     //
@@ -103,6 +105,13 @@ function init(){
     window.addEventListener('keydown', function(event) {
         if(event.keyCode == 27){ // Escape button
             isPlay = !isPlay;
+            if(isPlay === false){
+                blocker.style.display = 'block';
+                instructions.style.display = '';
+            }
+            else{
+                blocker.style.display = 'none';
+            }
             clock.getDelta();
             render_clk.getDelta();
         }
@@ -113,9 +122,12 @@ function onFocus(){
     isPlay = true;
     clock.getDelta();
     render_clk.getDelta();
+    blocker.style.display = 'none';
 }
 function onBlur(){
     isPlay = false;
+    blocker.style.display = 'block';
+    instructions.style.display = '';
 }
 
 // Handles Window resizing
