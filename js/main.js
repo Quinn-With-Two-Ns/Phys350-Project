@@ -12,6 +12,7 @@ var isPlay;
 var worldWidth = 124;
 var surface_width = 1000;
 var clock = new THREE.Clock();
+let render_clk = new THREE.Clock();
 
 var raycaster = new THREE.Raycaster();
 
@@ -85,6 +86,7 @@ function init(){
         if(event.keyCode == 27){ // Escape button
             isPlay = !isPlay;
             clock.getDelta();
+            render_clk.getDelta();
         }
     }, false);
 }
@@ -92,6 +94,7 @@ function init(){
 function onFocus(){
     isPlay = true;
     clock.getDelta();
+    render_clk.getDelta();
 }
 function onBlur(){
     isPlay = false;
@@ -129,13 +132,10 @@ function onDocumentMouseDown( event ) {
 
 
 // Renders the water
+
 function render(){
     if(!isPlay) return;
-    // Only update when the window is in focus (Dosn't Work)
     var delta = clock.getDelta();
-    if(document.visibilityState == "visible"){
-        fluid_height_map.update( delta ); // Performs a update of the simulation
-    }
     set_heights(fluid_height_map, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
     water_mesh.geometry.verticesNeedUpdate = true; // Make sure Three.js know we changed the mesh
     controls.update( delta );
@@ -152,3 +152,12 @@ function animate (){
 
 init();
 animate();
+
+// Simulation update moved here to make it faster then 60 Hz
+setInterval(function(){ 
+    if(!isPlay) return;
+    // Only update when the window is in focus (Dosn't Work)
+    if(document.visibilityState == "visible"){
+        fluid_height_map.update( render_clk.getDelta() ); // Performs a update of the simulation
+    }
+}, 1);
