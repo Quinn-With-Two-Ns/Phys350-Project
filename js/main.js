@@ -17,6 +17,11 @@ let render_clk = new THREE.Clock();
 var raycaster = new THREE.Raycaster();
 
 var fluid_height_map;
+// Simulation Parameters
+let sim_parameters = {
+    "wave Speed": 100,
+    amplitude: 50
+};
 
 // Initial Conditions for the Height/Velocity Map
 function init_conditions(heights, velocities){
@@ -32,7 +37,18 @@ function init_conditions(heights, velocities){
     heights[51][51] = 50;
 }
 
+function create_Gui()
+{
+    let gui = new dat.GUI();
+    let change = function(){
+        fluid_height_map.speed = sim_parameters["wave Speed"];
+    }
+    gui.add( sim_parameters, "wave Speed", 0, 1000, 0.1 ).onChange( change );
+    gui.add( sim_parameters, "amplitude", -100, 100, 0.1 ).onChange( change );
 
+    //
+    change();
+}
 
 
 
@@ -40,7 +56,7 @@ function init_conditions(heights, velocities){
 function init(){
     isPlay = true;
     // 
-    fluid_height_map = new Fluid_Height_Map(1000, 1000, worldWidth, worldWidth, init_conditions);
+    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions);
     //
     container = document.createElement( 'div' );
     document.body.appendChild( container );
@@ -62,11 +78,11 @@ function init(){
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
-    
+    //
     var water_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
     water_geometry.rotateX( - Math.PI / 2 );
     set_heights(fluid_height_map, water_geometry.vertices);
-    
+    //
     var water_texture = new THREE.TextureLoader().load( "textures/water.jpg" );
     water_texture.wrapS = water_texture.wrapT = THREE.RepeatWrapping;
     water_texture.repeat.set( 5, 5 );
@@ -77,7 +93,9 @@ function init(){
     scene.add( water_mesh );
     //
     //create_container(surface_width, 100, scene)
-
+    //
+    create_Gui();
+    //
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseDown, false );
     window.addEventListener( 'blur', onBlur, false );
@@ -108,7 +126,8 @@ function onWindowResize() {
     controls.handleResize();
 }
 // Handles Mouse Click
-function onDocumentMouseDown( event ) { 
+function onDocumentMouseDown( event ) {
+    if(!isPlay) return; 
     var mouse = new THREE.Vector2();
     // calculate mouse position in normalized device coordinates
 	// (-1 to +1) for both components
@@ -124,7 +143,7 @@ function onDocumentMouseDown( event ) {
         for(var i = 0; i < 3; i++){
             iy = Math.floor(vert_index[i] / (worldWidth+1));
             ix = vert_index[i] - (worldWidth+1)*iy;
-            fluid_height_map.height_field[iy][ix] += 50;
+            fluid_height_map.height_field[iy][ix] += sim_parameters.amplitude;
         }
     }
 }
@@ -132,7 +151,6 @@ function onDocumentMouseDown( event ) {
 
 
 // Renders the water
-
 function render(){
     if(!isPlay) return;
     var delta = clock.getDelta();
@@ -156,7 +174,7 @@ animate();
 // Simulation update moved here to make it faster then 60 Hz
 setInterval(function(){ 
     if(!isPlay) return;
-    // Only update when the window is in focus (Dosn't Work)
+    // Only update when the window is in focus
     if(document.visibilityState == "visible"){
         fluid_height_map.update( render_clk.getDelta() ); // Performs a update of the simulation
     }
