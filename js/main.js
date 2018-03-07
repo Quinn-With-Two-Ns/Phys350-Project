@@ -82,7 +82,7 @@ function init(){
     window.addEventListener( 'blur', onBlur, false );
     window.addEventListener( 'focus', onFocus, false );
     window.addEventListener('keydown', function(event) {
-        if(event.keyCode == 27){ //escape button
+        if(event.keyCode == 27){ // Escape button
             isPlay = !isPlay;
             clock.getDelta();
         }

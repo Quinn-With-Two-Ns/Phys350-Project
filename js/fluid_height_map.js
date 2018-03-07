@@ -20,6 +20,8 @@ class Fluid_Height_Map{
         let dx = this.width/this.nx; 
         let dy = this.length/this.ny; 
         var f;
+        // Warning if the timestep is too large
+        if( dt > dx/this.speed) { console.log("WARNING simulaton may be unstable"); } 
         // For now I just fixed the boundries to be constant
         // Does some laplacian crap
         for(var iy = 1; iy < this.ny - 1; iy++){
