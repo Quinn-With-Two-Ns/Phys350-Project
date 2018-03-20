@@ -12,7 +12,7 @@ var renderer;
 var water_mesh;
 var isPlay;
 
-var worldWidth = 124;
+var worldWidth = 100;
 var surface_width = 1000;
 var clock = new THREE.Clock();
 let render_clk = new THREE.Clock();
@@ -30,14 +30,15 @@ let sim_parameters = {
 function init_conditions(heights, velocities){
     // Zeros everything
     for(var iy = 0; iy < heights.length; iy++){
-        velocities[iy].fill(0.0);
-        heights[iy].fill(0.0);
+        velocities[iy].fill(new THREE.Vector2( 0, 0 ));
+        heights[iy].fill(1.0);
     }
     // Make a lil bump
-    heights[50][50] = 50;
-    heights[51][50] = 50;
-    heights[50][51] = 50;
-    heights[51][51] = 50;
+    heights[5][5] = 10;
+    //velocities[0][5].x = 100;
+    //heights[51][50] = 50;
+    //heights[50][51] = 50;
+    //heights[51][51] = 50;
 }
 
 function create_Gui()
