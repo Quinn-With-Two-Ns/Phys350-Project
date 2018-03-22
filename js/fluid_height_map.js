@@ -10,11 +10,8 @@ class Fluid_Height_Map{
         this.dy = this.length/this.ny; 
         
         this.g = createArray(nx,ny);
-        for(var j = 0; j < this.ny; j++){
-            for(var i = 0; i < this.nx; i++){
-                this.g[j][i] = 0;
-            }
-        }
+        heightMap(this.g);
+
 
         this.v1 = createArray(ny, nx);
         this.v2 = createArray(ny, nx);
@@ -61,8 +58,33 @@ class Fluid_Height_Map{
 
         for(var j = 1; j < this.ny-1; j++){
             for(var i = 1; i < this.nx-1; i++){
-                
-                n[j][i] -= n[j][i]*( (v1[j][i+1]-v1[j][i])/this.dx + (v2[j+1][i]-v2[j][i])/this.dx )*dt;
+                let h_11, h_12, h_21, h_22;
+
+                if(v1[i][j] <= 0){
+                    h_11 = n[i+1][j];
+                } else {
+                    h_11 = n[i][j];
+                }
+
+                if(v1[i-1][j] <= 0){
+                    h_12 = n[i][j];
+                } else {
+                    h_12 = n[i-1][j];
+                }
+
+                if(v2[i][j] <= 0){
+                    h_21 = n[i][j+1];
+                } else {
+                    h_21 = n[i][j];
+                }
+
+                if(v2[i][j-1] <= 0){
+                    h_22 = n[i][j];
+                } else {
+                    h_22 = n[i][j-1];
+                }
+
+                n[j][i] -= ( (h_11*v1[j][i+1]-h_12*v1[j][i])/this.dx + (h_12*v2[j+1][i]-h_22*v2[j][i])/this.dx )*dt;
             }
         }
 
@@ -101,7 +123,7 @@ class Fluid_Height_Map{
 
     */
     update( dt ){
-        
+        dt /= 1;
         this.n = this.advect( this.n, this.v1, this.v2, dt );
         this.v1 = this.advect( this.v1, this.v1, this.v2, dt );
         this.v2 = this.advect( this.v2, this.v1, this.v2, dt );

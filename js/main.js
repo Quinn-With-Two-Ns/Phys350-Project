@@ -9,7 +9,7 @@ var stats;
 var scene;
 var camera;
 var renderer;
-var water_mesh;
+var water_mesh, ground_mesh;
 var isPlay;
 
 var worldWidth = 100;
@@ -28,8 +28,8 @@ let sim_parameters = {
 
 // Initial Conditions for the Height/Velocity Map
 function init_conditions(heights, v1, v2){
-    for(var iy = 0; iy < heights[0].length; iy++){
-        for(var ix = 0; ix < heights.length; ix++){
+    for(var iy = 0; iy < heights.length; iy++){
+        for(var ix = 0; ix < heights[0].length; ix++){
             v1[iy][ix] = 0.0;
             v2[iy][ix] = 0.0;
             heights[iy][ix] = (10.0);
@@ -37,8 +37,17 @@ function init_conditions(heights, v1, v2){
     }
 }
 
-function heightMap(x, y){
-
+function heightMap(heights){
+    for(var j = 0; j < heights.length; j++){
+        for(var i = 0; i < heights[0].length; i++){
+            if(i > heights.length/4){
+                heights[j][i] = 4*(i-heights.length/4)/heights.length;
+            }
+            else{
+                heights[j][i] = 0;
+            }
+        }
+    }
 }
 
 function create_Gui()
@@ -81,11 +90,11 @@ function init(){
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
-    //
+    // Create the water
     var water_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
     water_geometry.rotateX( - Math.PI / 2 );
-    set_heights(fluid_height_map, water_geometry.vertices);
-    //
+    set_heights(fluid_height_map.n, water_geometry.vertices);
+    
     var water_texture = new THREE.TextureLoader().load( "textures/water.jpg" );
     water_texture.wrapS = water_texture.wrapT = THREE.RepeatWrapping;
     water_texture.repeat.set( 5, 5 );
@@ -94,8 +103,19 @@ function init(){
     
     water_mesh = new THREE.Mesh( water_geometry, water_material );
     scene.add( water_mesh );
+    // Create the ground
+    var ground_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
+    ground_geometry.rotateX( - Math.PI / 2 );
+    set_heights(fluid_height_map.g, ground_geometry.vertices);
     //
-    //create_container(surface_width, 100, scene)
+    var ground_texture = new THREE.TextureLoader().load( "textures/sand.png" );
+    ground_texture.wrapS = ground_texture.wrapT = THREE.RepeatWrapping;
+    ground_texture.repeat.set( 5, 5 );
+
+    var ground_material = new THREE.MeshBasicMaterial( { map: ground_texture } );
+    
+    ground_mesh = new THREE.Mesh( ground_geometry, ground_material );
+    scene.add( ground_mesh );
     //
     create_Gui();
     //
@@ -168,7 +188,7 @@ function render(){
     if(!isPlay) return;
     var delta = clock.getDelta();
     
-    set_heights(fluid_height_map, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
+    set_heights(fluid_height_map.n, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
     water_mesh.geometry.verticesNeedUpdate = true; // Make sure Three.js know we changed the mesh
     controls.update( delta );
     renderer.render(scene, camera);
