@@ -13,7 +13,7 @@ var water_mesh;
 var isPlay;
 
 var worldWidth = 100;
-var surface_width = 1000;
+var surface_width = 100;
 var clock = new THREE.Clock();
 let render_clk = new THREE.Clock();
 
@@ -23,7 +23,7 @@ var fluid_height_map;
 // Simulation Parameters
 let sim_parameters = {
     "wave Speed": 100,
-    amplitude: 50
+    amplitude: 1
 };
 
 // Initial Conditions for the Height/Velocity Map
@@ -48,7 +48,7 @@ function create_Gui()
         fluid_height_map.speed = sim_parameters["wave Speed"];
     }
     gui.add( sim_parameters, "wave Speed", 0, 1000, 0.1 ).onChange( change );
-    gui.add( sim_parameters, "amplitude", -100, 100, 0.1 ).onChange( change );
+    gui.add( sim_parameters, "amplitude", -10, 10, 0.1 ).onChange( change );
 
     //
     change();
@@ -167,6 +167,7 @@ function onDocumentMouseDown( event ) {
 function render(){
     if(!isPlay) return;
     var delta = clock.getDelta();
+    
     set_heights(fluid_height_map, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
     water_mesh.geometry.verticesNeedUpdate = true; // Make sure Three.js know we changed the mesh
     controls.update( delta );
@@ -188,7 +189,10 @@ animate();
 setInterval(function(){ 
     if(!isPlay) return;
     // Only update when the window is in focus
+    let dt = render_clk.getDelta();
+    if( dt > 1/60) return;
+    fluid_height_map.update( dt ); 
     if(document.visibilityState == "visible"){
-        fluid_height_map.update( render_clk.getDelta() ); // Performs a update of the simulation
+       // Performs a update of the simulation
     }
 }, 1);
