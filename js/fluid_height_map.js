@@ -16,10 +16,16 @@ class Fluid_Height_Map{
         this.v1 = createArray(ny, nx);
         this.v2 = createArray(ny, nx);
         this.n = createArray(ny, nx);
-        this.a = 0.1; // Units of [kg*m/s^2]
+        this.a = 9.81; // Units of [kg*m/s^2]
 
         this.h = createArray(this.ny, this.nx);
-        initial_conditions( this.n, this.v1, this.v2 );
+        initial_conditions( this.h, this.v1, this.v2 );
+        for(var j = 0; j < this.ny; j++){
+            for(var i = 0; i < this.nx; i++){
+                this.n[j][i] = this.h[j][i] - this.g[j][i];
+            }
+        }
+
 
     }
 
@@ -109,24 +115,27 @@ class Fluid_Height_Map{
         Variables:
             h - height above zero level
             g - height of grounds
-            n - is height above ground (h - g), for nomw assume g = 0 => n = h
+            n - is height above ground (h - g)
             v - horizontal velocity (x,z) or (v1,v2)
-            an - vertical acceleration of fluid (gravity)  
+            a - vertical acceleration of fluid (gravity)  
         Governing Equations
             (d/dt)n + (grad n)v = -n(div v)
             and
-            (d/dt)v + (grad v)v = an(grad h)
+            (d/dt)v + (grad v)v = a(grad h)
             or
-            (d/dt)v1 + (grad v1)v = an(grad h)
-            (d/dt)v2 + (grad v2)v = -an(grad h)
+            (d/dt)v1 + (grad v1)v = a(grad h)
+            (d/dt)v2 + (grad v2)v = a(grad h)
             where, v1,v2 are x and z velocities respectivly
 
     */
     update( dt ){
         dt /= 1;
-        this.n = this.advect( this.n, this.v1, this.v2, dt );
-        this.v1 = this.advect( this.v1, this.v1, this.v2, dt );
-        this.v2 = this.advect( this.v2, this.v1, this.v2, dt );
+        let v1_copy = clone(this.v1);
+        let v2_copy = clone(this.v2);
+        
+        this.n = this.advect( this.n, v1_copy, v2_copy, dt );
+        this.v1 = this.advect( this.v1, v1_copy, v2_copy, dt );
+        this.v2 = this.advect( this.v2, v1_copy, v2_copy, dt );
         
         this.updateHeights(this.n, this.v1, this.v2, dt);
     

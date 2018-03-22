@@ -26,6 +26,8 @@ let sim_parameters = {
     amplitude: 1
 };
 
+
+
 // Initial Conditions for the Height/Velocity Map
 function init_conditions(heights, v1, v2){
     for(var iy = 0; iy < heights.length; iy++){
@@ -41,7 +43,7 @@ function heightMap(heights){
     for(var j = 0; j < heights.length; j++){
         for(var i = 0; i < heights[0].length; i++){
             if(i > heights.length/4){
-                heights[j][i] = 4*(i-heights.length/4)/heights.length;
+                heights[j][i] = 6.0*(i-heights.length/4)/heights.length;
             }
             else{
                 heights[j][i] = 0;
@@ -54,9 +56,8 @@ function create_Gui()
 {
     let gui = new dat.GUI();
     let change = function(){
-        fluid_height_map.speed = sim_parameters["wave Speed"];
+        
     }
-    gui.add( sim_parameters, "wave Speed", 0, 1000, 0.1 ).onChange( change );
     gui.add( sim_parameters, "amplitude", -10, 10, 0.1 ).onChange( change );
 
     //
@@ -93,14 +94,15 @@ function init(){
     // Create the water
     var water_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
     water_geometry.rotateX( - Math.PI / 2 );
-    set_heights(fluid_height_map.n, water_geometry.vertices);
+    set_heights(fluid_height_map.h, water_geometry.vertices);
     
     var water_texture = new THREE.TextureLoader().load( "textures/water.jpg" );
     water_texture.wrapS = water_texture.wrapT = THREE.RepeatWrapping;
     water_texture.repeat.set( 5, 5 );
 
     var water_material = new THREE.MeshBasicMaterial( { color: 0x0000ff, map: water_texture } );
-    
+    water_material.transparent = true;
+    water_material.opacity = 0.75;
     water_mesh = new THREE.Mesh( water_geometry, water_material );
     scene.add( water_mesh );
     // Create the ground
@@ -111,11 +113,18 @@ function init(){
     var ground_texture = new THREE.TextureLoader().load( "textures/sand.png" );
     ground_texture.wrapS = ground_texture.wrapT = THREE.RepeatWrapping;
     ground_texture.repeat.set( 5, 5 );
-
     var ground_material = new THREE.MeshBasicMaterial( { map: ground_texture } );
     
     ground_mesh = new THREE.Mesh( ground_geometry, ground_material );
     scene.add( ground_mesh );
+    // Create a black plane to show groud levels better
+    var sur = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
+    sur.rotateX( - Math.PI / 2 );
+    var mat = new THREE.MeshBasicMaterial( { color:0x000000 } );
+    
+    mesh = new THREE.Mesh( sur, mat );
+    mesh.translateY(-0.1);
+    scene.add( mesh );
     //
     create_Gui();
     //
@@ -188,7 +197,7 @@ function render(){
     if(!isPlay) return;
     var delta = clock.getDelta();
     
-    set_heights(fluid_height_map.n, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
+    set_heights(fluid_height_map.h, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
     water_mesh.geometry.verticesNeedUpdate = true; // Make sure Three.js know we changed the mesh
     controls.update( delta );
     renderer.render(scene, camera);
