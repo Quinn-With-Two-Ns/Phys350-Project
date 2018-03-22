@@ -11,13 +11,13 @@ class Fluid_Height_Map{
         
         this.g = createArray(nx,ny);
         heightMap(this.g);
-
+        this.bc = 'fixed';
 
         this.v1 = createArray(ny, nx);
         this.v2 = createArray(ny, nx);
         this.n = createArray(ny, nx);
         this.a = 9.81; // Units of [kg*m/s^2]
-
+        this.time = 0;
         this.h = createArray(this.ny, this.nx);
         initial_conditions( this.h, this.v1, this.v2 );
         for(var j = 0; j < this.ny; j++){
@@ -48,13 +48,18 @@ class Fluid_Height_Map{
 
     advect( s, v1, v2, dt ){
         let s_new = clone(s);
-        for(var j = 1; j < this.ny-1; j++){
-            for(var i = 1; i < this.nx-1; i++){
-                let x0 = i*this.dx;
-                let y0 = j*this.dy;
-                let x1 = x0 - dt*v1[j][i];
-                let y1 = y0 - dt*v2[j][i];
-                s_new[j][i] = this.biLinearInterpolate(s, x1, y1);
+        for(var j = 0; j < this.ny; j++){
+            for(var i = 0; i < this.nx; i++){
+                if(i == 0 || j == 0 || j == (this.ny-1) || i == (this.nx-1))
+                {
+
+                } else {
+                    let x0 = i*this.dx;
+                    let y0 = j*this.dy;
+                    let x1 = x0 - dt*v1[j][i];
+                    let y1 = y0 - dt*v2[j][i];
+                    s_new[j][i] = this.biLinearInterpolate(s, x1, y1);
+                }
             }
         }
         return s_new;
@@ -129,7 +134,11 @@ class Fluid_Height_Map{
 
     */
     update( dt ){
+        this.time += dt;
         dt /= 1;
+        for(let k = 0; k < this.ny; k++){
+            this.n[k][1] = 10 + 3*Math.sin(1*this.time);
+        }
         let v1_copy = clone(this.v1);
         let v2_copy = clone(this.v2);
         
@@ -139,8 +148,8 @@ class Fluid_Height_Map{
         
         this.updateHeights(this.n, this.v1, this.v2, dt);
     
-        for(var j = 0; j < this.ny; j++){
-            for(var i = 0; i < this.nx; i++){
+        for(let j = 0; j < this.ny; j++){
+            for(let i = 0; i < this.nx; i++){
                 this.h[j][i] = this.n[j][i] + this.g[j][i];
             }
         }
