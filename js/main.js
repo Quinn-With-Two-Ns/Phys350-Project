@@ -27,18 +27,18 @@ let sim_parameters = {
 };
 
 // Initial Conditions for the Height/Velocity Map
-function init_conditions(heights, velocities){
-    // Zeros everything
-    for(var iy = 0; iy < heights.length; iy++){
-        velocities[iy].fill(new THREE.Vector2( 0, 0 ));
-        heights[iy].fill(1.0);
+function init_conditions(heights, v1, v2){
+    for(var iy = 0; iy < heights[0].length; iy++){
+        for(var ix = 0; ix < heights.length; ix++){
+            v1[iy][ix] = 0.0;
+            v2[iy][ix] = 0.0;
+            heights[iy][ix] = (10.0);
+        }
     }
-    // Make a lil bump
-    heights[5][5] = 10;
-    //velocities[0][5].x = 100;
-    //heights[51][50] = 50;
-    //heights[50][51] = 50;
-    //heights[51][51] = 50;
+}
+
+function heightMap(x, y){
+
 }
 
 function create_Gui()
@@ -60,7 +60,7 @@ function create_Gui()
 function init(){
     isPlay = true;
     // 
-    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions);
+    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions, heightMap);
     //
     container = document.getElementById( 'container' );
     stats = new Stats(); // Gives the framerate in the top corner 
@@ -156,7 +156,7 @@ function onDocumentMouseDown( event ) {
         for(var i = 0; i < 3; i++){
             iy = Math.floor(vert_index[i] / (worldWidth+1));
             ix = vert_index[i] - (worldWidth+1)*iy;
-            fluid_height_map.height_field[iy][ix] += sim_parameters.amplitude;
+            fluid_height_map.n[iy][ix] += sim_parameters.amplitude;
         }
     }
 }

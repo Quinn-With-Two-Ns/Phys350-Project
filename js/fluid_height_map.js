@@ -1,5 +1,5 @@
 class Fluid_Height_Map{
-    constructor( width, length, nx, ny, initial_conditions){
+    constructor( width, length, nx, ny, initial_conditions, heightMap){
         this.width = width;
         this.length = length;
         nx += 1;
@@ -8,22 +8,21 @@ class Fluid_Height_Map{
         this.ny = ny;
         this.dx = this.width/this.nx; 
         this.dy = this.length/this.ny; 
-
-        this.speed = 10000;
+        
+        this.g = createArray(nx,ny);
+        for(var j = 0; j < this.ny; j++){
+            for(var i = 0; i < this.nx; i++){
+                this.g[j][i] = 0;
+            }
+        }
 
         this.v1 = createArray(ny, nx);
         this.v2 = createArray(ny, nx);
-        this.height_field = createArray(ny, nx);
-        this.a = -0.1; // Units of [kg*m/s^2]
-        for(var iy = 0; iy < this.height_field.length; iy++){
-            for(var ix = 0; ix < this.height_field.length; ix++){
-                this.v1[iy][ix] = 0.0;
-                this.v2[iy][ix] = 0.0;
-                this.height_field[iy][ix] = (1.0);
-            }
-        }
-        
-        //initial_conditions(this.height_field, this.velocity_field);
+        this.n = createArray(ny, nx);
+        this.a = 0.1; // Units of [kg*m/s^2]
+
+        this.h = createArray(this.ny, this.nx);
+        initial_conditions( this.n, this.v1, this.v2 );
 
     }
 
@@ -62,7 +61,8 @@ class Fluid_Height_Map{
 
         for(var j = 1; j < this.ny-1; j++){
             for(var i = 1; i < this.nx-1; i++){
-                n[j][i] += n[j][i]*( (v1[j][i+1]-v1[j][i])/this.dx + (v2[j+1][i]-v2[j][i])/this.dx )
+                
+                n[j][i] -= n[j][i]*( (v1[j][i+1]-v1[j][i])/this.dx + (v2[j+1][i]-v2[j][i])/this.dx )*dt;
             }
         }
 
@@ -83,6 +83,7 @@ class Fluid_Height_Map{
     }
 
     /*
+
         Variables:
             h - height above zero level
             g - height of grounds
@@ -98,27 +99,29 @@ class Fluid_Height_Map{
             (d/dt)v2 + (grad v2)v = -an(grad h)
             where, v1,v2 are x and z velocities respectivly
 
-    
-    
     */
     update( dt ){
-
-        let dh = createArray(this.ny, this.nx);
-        let dv = createArray(this.ny, this.nx);
-
-        // 
-        this.height_field = this.advect( this.height_field, this.v1, this.v2, dt );
+        
+        this.n = this.advect( this.n, this.v1, this.v2, dt );
         this.v1 = this.advect( this.v1, this.v1, this.v2, dt );
         this.v2 = this.advect( this.v2, this.v1, this.v2, dt );
-        this.updateHeights(this.height_field, this.v1, this.v2, dt);
-        this.updateVelocities(this.height_field, this.v1, this.v2, dt);
+        
+        this.updateHeights(this.n, this.v1, this.v2, dt);
+    
+        for(var j = 0; j < this.ny; j++){
+            for(var i = 0; i < this.nx; i++){
+                this.h[j][i] = this.n[j][i] + this.g[j][i];
+            }
+        }
+
+        this.updateVelocities(this.h, this.v1, this.v2, dt);
         
     }
 
     height(x, y){
-        return this.height_field[y][x];
+        return this.n[y][x];
     }
     set_height(x, y, val){
-        this.height_field[y][x] = val;
+        this.n[y][x] = val;
     }
 }
