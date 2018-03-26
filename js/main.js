@@ -23,7 +23,7 @@ var fluid_height_map;
 // Simulation Parameters
 let sim_parameters = {
     "wave Speed": 100,
-    amplitude: 1
+    amplitude: 3
 };
 
 
