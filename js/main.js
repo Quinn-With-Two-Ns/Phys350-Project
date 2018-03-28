@@ -88,7 +88,9 @@ function init(){
 		'Daylight Box_Back.bmp'
 	] );
     //
-    
+    var light = new THREE.PointLight( 0xff, 1, 100 );
+    light.position.set( 50, 50, 50 );
+    scene.add( light );
     //
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
     camera.position.y = 150;
@@ -98,6 +100,7 @@ function init(){
     controls = new THREE.FirstPersonControls( camera );
     controls.movementSpeed =250;
     controls.lookSpeed = 0.1;
+    //scene.add( camera.pitchObject );
     //
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );

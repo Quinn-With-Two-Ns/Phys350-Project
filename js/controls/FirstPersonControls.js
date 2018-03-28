@@ -107,7 +107,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			case 37: /*left*/ this.turnLeft = true; break;
 			case 65: /*A*/ this.moveLeft = true; break;
 
-			case 40: /*down*/ this.turnDown = true; break
+			case 40: /*down*/ this.turnDown = true; break;
 			case 83: /*S*/ this.moveBackward = true; break;
 
 			case 39: /*right*/ this.turnRight = true; break;
@@ -130,10 +130,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			case 37: /*left*/ this.turnLeft = false; break;
 			case 65: /*A*/ this.moveLeft = false; break;
 
-			case 40: /*down*/ this.turnDown = false; break
+			case 40: /*down*/ this.turnDown = false; break;
 			case 83: /*S*/ this.moveBackward = false; break;
 
-			case 39: /*right*/ this.turnRight = false; break
+			case 39: /*right*/ this.turnRight = false; break;
 			case 68: /*D*/ this.moveRight = false; break;
 
 			case 82: /*R*/ this.moveUp = false; break;
@@ -172,7 +172,14 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
 
 		var actualLookSpeed = delta * this.lookSpeed;
+		
+		if ( this.turnUp ) this.object.rotation.x += actualLookSpeed;
+		if ( this.turnDown ) this.object.rotation.x -= actualLookSpeed;
 
+		if ( this.turnRight ) this.object.rotation.y -= actualLookSpeed;
+		if ( this.turnLeft ) this.object.rotation.y += actualLookSpeed;
+		
+		/*
 		if ( ! this.activeLook ) {
 
 			actualLookSpeed = 0;
@@ -209,7 +216,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
 
 		this.object.lookAt( targetPosition );
-
+		*/
 	};
 
 	function contextmenu( event ) {
