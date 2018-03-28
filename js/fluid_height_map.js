@@ -123,7 +123,6 @@ class Fluid_Height_Map {
                 n[j][i] -= ((h_11 * v1[j][i + 1] - h_12 * v1[j][i]) / this.dx + (h_12 * v2[j + 1][i] - h_22 * v2[j][i]) / this.dy) * dt;
             }
         }
-
     }
 
     /**
@@ -171,9 +170,11 @@ class Fluid_Height_Map {
     update(dt) {
         this.time += dt;
         dt /= 1;
+
         for (let k = 0; k < this.ny; k++) {
             this.n[k][1] = 10 + 3 * Math.sin(1 * this.time);
         }
+
         let v1_copy = clone(this.v1);
         let v2_copy = clone(this.v2);
 
@@ -194,7 +195,6 @@ class Fluid_Height_Map {
 
         //Update velociteis
         this.updateVelocities(this.h, this.v1, this.v2, dt);
-
     }
 
     //Getter and setter for height above ground array.

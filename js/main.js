@@ -100,7 +100,7 @@ function init(){
     water_texture.wrapS = water_texture.wrapT = THREE.RepeatWrapping;
     water_texture.repeat.set( 5, 5 );
 
-    var water_material = new THREE.MeshBasicMaterial( { color: 0x0000ff, map: water_texture } );
+    var water_material = new THREE.MeshBasicMaterial( { color: 0x0066ff, map: water_texture } );
     water_material.transparent = true;
     water_material.opacity = 0.75;
     water_mesh = new THREE.Mesh( water_geometry, water_material );
