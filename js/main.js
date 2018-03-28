@@ -77,7 +77,18 @@ function init(){
     container.appendChild( stats.dom );
     //
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xffffff );
+    scene.background = new THREE.CubeTextureLoader()
+	.setPath( 'textures/cubeMaps/' )
+	.load( [
+		'Daylight Box_Right.bmp',
+		'Daylight Box_Left.bmp',
+		'Daylight Box_Top.bmp',
+		'Daylight Box_Bottom.bmp',
+		'Daylight Box_Front.bmp',
+		'Daylight Box_Back.bmp'
+	] );
+    //
+    
     //
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
     camera.position.y = 150;
