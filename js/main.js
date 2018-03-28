@@ -159,6 +159,7 @@ function onBlur(){
     blocker.style.display = 'block';
     instructions.style.display = '';
 }
+//isaac#1
 
 // Handles Window resizing
 function onWindowResize() {
