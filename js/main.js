@@ -93,14 +93,14 @@ function init(){
     scene.add( light );
     //
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
-    camera.position.y = 150;
-    camera.position.x = -550;
-    camera.position.z = 5;
+    camera.position.y = 80;
+    camera.position.x = 0;
+    camera.position.z = 200;
     // Set up the first person controls should proably be changed to use keyboard
     controls = new THREE.FirstPersonControls( camera );
     controls.movementSpeed =250;
-    controls.lookSpeed = 0.1;
-    //scene.add( camera.pitchObject );
+    controls.lookSpeed = 0.3;
+    scene.add( controls.rotGroup );
     //
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );

@@ -14,7 +14,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.enabled = true;
 
 	this.movementSpeed = 1.0;
-	this.lookSpeed = 0.005;
+	this.lookSpeed = 0.01;
 
 	this.lookVertical = true;
 	this.autoForward = false;
@@ -54,6 +54,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
+
+	this.rotGroup = new THREE.Group();
+	this.rotGroup.add(this.object);
 
 	if ( this.domElement !== document ) {
 
@@ -162,61 +165,23 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		var actualMoveSpeed = delta * this.movementSpeed;
 
-		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
-		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
+		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.rotGroup.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+		if ( this.moveBackward ) this.rotGroup.translateZ( actualMoveSpeed );
 
-		if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
-		if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
+		if ( this.moveLeft ) this.rotGroup.translateX( - actualMoveSpeed );
+		if ( this.moveRight ) this.rotGroup.translateX( actualMoveSpeed );
 
-		if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
-		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
+		if ( this.moveUp ) this.rotGroup.translateY( actualMoveSpeed );
+		if ( this.moveDown ) this.rotGroup.translateY( - actualMoveSpeed );
 
 		var actualLookSpeed = delta * this.lookSpeed;
 		
 		if ( this.turnUp ) this.object.rotation.x += actualLookSpeed;
 		if ( this.turnDown ) this.object.rotation.x -= actualLookSpeed;
 
-		if ( this.turnRight ) this.object.rotation.y -= actualLookSpeed;
-		if ( this.turnLeft ) this.object.rotation.y += actualLookSpeed;
-		
-		/*
-		if ( ! this.activeLook ) {
-
-			actualLookSpeed = 0;
-
-		}
-
-		var verticalLookRatio = 1;
-
-		if ( this.constrainVertical ) {
-
-			verticalLookRatio = Math.PI / ( this.verticalMax - this.verticalMin );
-
-		}
-
-		this.lon += this.mouseX * actualLookSpeed;
-		if ( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
-
-		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
-		this.phi = THREE.Math.degToRad( 90 - this.lat );
-
-		this.theta = THREE.Math.degToRad( this.lon );
-
-		if ( this.constrainVertical ) {
-
-			this.phi = THREE.Math.mapLinear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
-
-		}
-
-		var targetPosition = this.target,
-			position = this.object.position;
-
-		targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-		targetPosition.y = position.y + 100 * Math.cos( this.phi );
-		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
-
-		this.object.lookAt( targetPosition );
-		*/
+		if ( this.turnRight ) this.rotGroup.rotation.y -= actualLookSpeed;
+		if ( this.turnLeft ) this.rotGroup.rotation.y += actualLookSpeed;
+	
 	};
 
 	function contextmenu( event ) {
