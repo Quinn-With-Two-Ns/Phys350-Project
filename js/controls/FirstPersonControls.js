@@ -57,8 +57,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.rotGroup = new THREE.Group();
 	this.transGroup = new THREE.Group();
-	this.rotGroup.add(this.transGroup);
-	this.transGroup.add(this.object);
+	this.transGroup.add(this.rotGroup);
+	this.rotGroup.add(this.object);
 
 	if ( this.domElement !== document ) {
 
@@ -167,8 +167,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		var actualMoveSpeed = delta * this.movementSpeed;
 
-		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.rotGroup.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
-		if ( this.moveBackward ) this.rotGroup.translateZ( actualMoveSpeed );
+		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.transGroup.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+		if ( this.moveBackward ) this.transGroup.translateZ( actualMoveSpeed );
 
 		if ( this.moveLeft ) this.transGroup.translateX( - actualMoveSpeed );
 		if ( this.moveRight ) this.transGroup.translateX( actualMoveSpeed );

@@ -11,7 +11,7 @@ var camera;
 var renderer;
 var water_mesh, ground_mesh;
 var isPlay;
-
+let bgSound
 var worldWidth = 100;
 var surface_width = 100;
 var clock = new THREE.Clock();
@@ -55,11 +55,9 @@ function heightMap(heights){
 function create_Gui()
 {
     let gui = new dat.GUI();
-    let change = function(){
-        
+    let change = function(){  
     }
     gui.add( sim_parameters, "amplitude", -10, 10, 0.1 ).onChange( change );
-
     //
     change();
 }
@@ -88,20 +86,29 @@ function init(){
 		'Daylight Box_Back.bmp'
 	] );
     //
+    let listener = new THREE.AudioListener();
+    bgSound = new THREE.Audio( listener );
+    let bgAudioLoader = new THREE.AudioLoader();
+    bgAudioLoader.load( 'audio/ocean.mp3', ( buffer ) => {
+        bgSound.setBuffer( buffer );
+        bgSound.setLoop( true );
+        bgSound.setVolume( 1.0 );
+        bgSound.play();
+    });
+    //
     var light = new THREE.PointLight( 0xff, 1, 100 );
     light.position.set( 50, 50, 50 );
     scene.add( light );
     //
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
-
     // Set up the first person controls should proably be changed to use keyboard
     controls = new THREE.FirstPersonControls( camera );
     controls.movementSpeed =250;
     controls.lookSpeed = 0.3;
-    scene.add( controls.rotGroup );
-    controls.rotGroup.translateX(0);
-    controls.rotGroup.translateY(80);
-    controls.rotGroup.translateZ(200);
+    scene.add( controls.transGroup );
+    controls.transGroup.translateX(0);
+    controls.transGroup.translateY(80);
+    controls.transGroup.translateZ(200);
     //
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -153,9 +160,11 @@ function init(){
             if(isPlay === false){
                 blocker.style.display = 'block';
                 instructions.style.display = '';
+                bgSound.pause()
             }
             else{
                 blocker.style.display = 'none';
+                bgSound.play()
             }
             clock.getDelta();
             render_clk.getDelta();
@@ -163,18 +172,22 @@ function init(){
     }, false);
 }
 
+
+
 function onFocus(){
     isPlay = true;
     clock.getDelta();
     render_clk.getDelta();
     blocker.style.display = 'none';
+    bgSound.play()
 }
+
 function onBlur(){
     isPlay = false;
     blocker.style.display = 'block';
     instructions.style.display = '';
+    bgSound.pause()
 }
-//isaac#1
 
 // Handles Window resizing
 function onWindowResize() {
