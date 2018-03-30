@@ -23,7 +23,8 @@ var fluid_height_map;
 // Simulation Parameters
 let sim_parameters = {
     "wave Speed": 100,
-    amplitude: 3
+    amplitude: 3,
+    reset:()=>{ fluid_height_map.reset(); }
 };
 
 
@@ -58,6 +59,7 @@ function create_Gui()
     let change = function(){  
     }
     gui.add( sim_parameters, "amplitude", -10, 10, 0.1 ).onChange( change );
+    gui.add( sim_parameters, 'reset' );
     //
     change();
 }

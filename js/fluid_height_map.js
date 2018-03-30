@@ -27,6 +27,7 @@ class Fluid_Height_Map {
         this.dx = this.width / this.nx;
         this.dy = this.length / this.ny;
 
+        this.heightMap = heightMap;
         this.g = createArray(nx, ny);
         heightMap(this.g);
         this.bc = 'fixed';
@@ -37,6 +38,7 @@ class Fluid_Height_Map {
         this.a = 9.81; // Units of [kg*m/s^2]
         this.time = 0;
         this.h = createArray(this.ny, this.nx);
+        this.initial_conditions = initial_conditions;
         initial_conditions(this.h, this.v1, this.v2);
         for (var j = 0; j < this.ny; j++) {
             for (var i = 0; i < this.nx; i++) {
@@ -195,6 +197,20 @@ class Fluid_Height_Map {
 
         //Update velociteis
         this.updateVelocities(this.h, this.v1, this.v2, dt);
+    }
+    /*
+    */
+    reset()
+    {
+        this.heightMap(this.g);
+        this.initial_conditions(this.h, this.v1, this.v2);
+        for (var j = 0; j < this.ny; j++) {
+            for (var i = 0; i < this.nx; i++) {
+                this.n[j][i] = this.h[j][i] - this.g[j][i];
+            }
+        }
+        this.time = 0;
+
     }
 
     //Getter and setter for height above ground array.
