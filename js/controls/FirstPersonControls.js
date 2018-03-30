@@ -165,17 +165,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		}
 
-		var actualMoveSpeed = delta * this.movementSpeed;
-
-		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.transGroup.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
-		if ( this.moveBackward ) this.transGroup.translateZ( actualMoveSpeed );
-
-		if ( this.moveLeft ) this.transGroup.translateX( - actualMoveSpeed );
-		if ( this.moveRight ) this.transGroup.translateX( actualMoveSpeed );
-
-		if ( this.moveUp ) this.transGroup.translateY( actualMoveSpeed );
-		if ( this.moveDown ) this.transGroup.translateY( - actualMoveSpeed );
-
 		var actualLookSpeed = delta * this.lookSpeed;
 		
 		if ( this.turnUp ) this.object.rotation.x += actualLookSpeed;
@@ -183,6 +172,23 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		if ( this.turnRight ) this.rotGroup.rotation.y -= actualLookSpeed;
 		if ( this.turnLeft ) this.rotGroup.rotation.y += actualLookSpeed;
+
+		var actualMoveSpeed = delta * this.movementSpeed;
+		let velocity = new THREE.Vector3(0,0,0);
+
+		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) velocity.z -= actualMoveSpeed;
+		if ( this.moveBackward ) velocity.z += actualMoveSpeed;
+
+		if ( this.moveLeft ) velocity.x -= actualMoveSpeed;
+		if ( this.moveRight ) velocity.x += actualMoveSpeed;
+
+		if ( this.moveUp ) this.transGroup.translateY( actualMoveSpeed );
+		if ( this.moveDown ) this.transGroup.translateY( - actualMoveSpeed );
+
+		let rv = new THREE.Vector3(velocity.x, velocity.y, velocity.z);
+		rv.applyQuaternion(this.rotGroup.quaternion);
+		this.transGroup.translateZ( rv.z );
+		this.transGroup.translateX( rv.x );
 	
 	};
 

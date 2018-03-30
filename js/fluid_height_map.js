@@ -174,7 +174,7 @@ class Fluid_Height_Map {
         dt /= 1;
 
         for (let k = 0; k < this.ny; k++) {
-            this.n[k][1] = 10 + 3 * Math.sin(1 * this.time);
+            this.n[k][1] = 10 + 6 * Math.sin(1 * this.time);
         }
 
         let v1_copy = clone(this.v1);
