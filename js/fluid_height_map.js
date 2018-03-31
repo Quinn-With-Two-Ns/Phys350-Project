@@ -26,6 +26,7 @@ class Fluid_Height_Map {
         this.ny = ny;
         this.dx = this.width / this.nx;
         this.dy = this.length / this.ny;
+        this.simulation_Speed = 1.0;
 
         this.heightMap = heightMap;
         this.g = createArray(nx, ny);
@@ -170,8 +171,9 @@ class Fluid_Height_Map {
      * @param {double} dt Time step value.
      */
     update(dt) {
-        this.time += 0.95*dt;
-        dt /= 1;
+        dt *= this.simulation_Speed;
+        this.time += dt;
+        
 
         for (let k = 0; k < this.ny; k++) {
             this.n[k][1] = 10 + 10 * Math.sin(1 * this.time);
