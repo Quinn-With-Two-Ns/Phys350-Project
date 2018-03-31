@@ -170,11 +170,11 @@ class Fluid_Height_Map {
      * @param {double} dt Time step value.
      */
     update(dt) {
-        this.time += dt;
+        this.time += 0.95*dt;
         dt /= 1;
 
         for (let k = 0; k < this.ny; k++) {
-            this.n[k][1] = 10 + 6 * Math.sin(1 * this.time);
+            this.n[k][1] = 10 + 10 * Math.sin(1 * this.time);
         }
 
         let v1_copy = clone(this.v1);
