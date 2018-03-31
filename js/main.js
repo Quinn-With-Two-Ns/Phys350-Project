@@ -32,25 +32,20 @@ let sim_parameters = {
 
 
 // Initial Conditions for the Height/Velocity Map
-function init_conditions(heights, v1, v2){
-    for(var iy = 0; iy < heights.length; iy++){
-        for(var ix = 0; ix < heights[0].length; ix++){
-            v1[iy][ix] = 0.0;
-            v2[iy][ix] = 0.0;
-            heights[iy][ix] = (10.0);
-        }
+function init_conditions(heights, v){
+    for(var ix = 0; ix < heights.length; ix++){
+        v[ix] = 0.0;
+        heights[ix] = (10.0);
     }
 }
 
 function heightMap_ramp(heights){
-    for(var j = 0; j < heights.length; j++){
-        for(var i = 0; i < heights[0].length; i++){
-            if(i > heights.length/4){
-                heights[j][i] = 6.0*(i-heights.length/4)/heights.length;
-            }
-            else{
-                heights[j][i] = 0;
-            }
+    for(var i = 0; i < heights.length; i++){
+        if(i > heights.length/4){
+            heights[i] = 6.0*(i-heights.length/4)/heights.length;
+        }
+        else{
+            heights[i] = 0;
         }
     }
 }
@@ -74,7 +69,7 @@ function create_Gui()
 function init(){
     isPlay = true;
     // 
-    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions, heightMap_ramp);
+    fluid_height_map = new Fluid_Height_Map(surface_width, worldWidth, init_conditions, heightMap_ramp);
     //
     container = document.getElementById( 'container' );
     stats = new Stats(); // Gives the framerate in the top corner 
@@ -158,7 +153,6 @@ function init(){
     create_Gui();
     //
     window.addEventListener( 'resize', onWindowResize, false );
-    window.addEventListener( 'click', onDocumentMouseDown, false );
     window.addEventListener( 'blur', onBlur, false );
     window.addEventListener( 'focus', onFocus, false );
     window.addEventListener('keydown', function(event) {
@@ -202,28 +196,6 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls.handleResize();
-}
-// Handles Mouse Click
-function onDocumentMouseDown( event ) {
-    if(!isPlay) return; 
-    var mouse = new THREE.Vector2();
-    // calculate mouse position in normalized device coordinates
-	// (-1 to +1) for both components
-	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    raycaster.setFromCamera( mouse, camera );
-    // Look where the mouse clicked and pull up the first face that intersects with the mouse
-    var intersect_data = raycaster.intersectObject(water_mesh, false);
-    // See if we clicked on anything
-    if(intersect_data.length > 0){
-        var face_hit = intersect_data[0].face; // just look at the first face clicked on
-        var vert_index = [face_hit.a, face_hit.b, face_hit.c];
-        for(var i = 0; i < 3; i++){
-            iy = Math.floor(vert_index[i] / (worldWidth+1));
-            ix = vert_index[i] - (worldWidth+1)*iy;
-            fluid_height_map.n[iy][ix] += sim_parameters.amplitude;
-        }
-    }
 }
 
 
