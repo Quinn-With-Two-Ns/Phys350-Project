@@ -147,7 +147,7 @@ class Fluid_Height_Map {
         
 
 
-        this.n[0] = 10 + 2 * Math.sin(1 * this.time);
+        this.n[30] = 10 + 4 * Math.sin(1 * this.time);
         
 
         let v_copy = clone(this.v);

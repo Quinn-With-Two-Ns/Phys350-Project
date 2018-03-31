@@ -3,7 +3,7 @@ function set_vertex( vertices, x, y, val){
 }
 
 function at(vertices, x, y){
-    return (vertices[ (worldWidth+1)*y + x ]).y;
+    return (vertices[ (worldDepth+1)*y + x ]).y;
 }
 
 function createArray(length) {
@@ -20,7 +20,7 @@ function createArray(length) {
 
 function set_heights(fluid_map, verticies)
 {
-    for(var iy = 0; iy < fluid_map.length ; iy++){
+    for(var iy = 0; iy < worldDepth+1 ; iy++){
         for(var ix = 0; ix < fluid_map.length ; ix++){
             set_vertex(verticies, ix, iy, fluid_map[ix]);
         }

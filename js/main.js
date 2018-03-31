@@ -14,7 +14,9 @@ let mesh_sides = new Array(4);
 var isPlay;
 let bgSound
 var worldWidth = 100;
-var surface_width = 1000;
+var worldDepth = 10;
+
+var surface_width = 100;
 var clock = new THREE.Clock();
 let render_clk = new THREE.Clock();
 
@@ -41,12 +43,9 @@ function init_conditions(heights, v){
 
 function heightMap_ramp(heights){
     for(var i = 0; i < heights.length; i++){
-        if(i > heights.length/4){
-            heights[i] = 6.0*(i-heights.length/4)/heights.length;
-        }
-        else{
-            heights[i] = 0;
-        }
+
+        heights[i] = 7.0*(i)/heights.length;
+
     }
 }
 
@@ -115,7 +114,7 @@ function init(){
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
     // Create the water
-    var water_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
+    var water_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldDepth );
     water_geometry.rotateX( - Math.PI / 2 );
     set_heights(fluid_height_map.h, water_geometry.vertices);
     
@@ -131,7 +130,7 @@ function init(){
     // Create sides
 
     // Create the ground
-    var ground_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
+    var ground_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldDepth );
     ground_geometry.rotateX( - Math.PI / 2 );
     set_heights(fluid_height_map.g, ground_geometry.vertices);
     //
@@ -142,7 +141,7 @@ function init(){
     ground_mesh = new THREE.Mesh( ground_geometry, ground_material );
     scene.add( ground_mesh );
     // Create a black plane to show groud levels better
-    var sur = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
+    var sur = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldDepth );
     sur.rotateX( - Math.PI / 2 );
     var mat = new THREE.MeshBasicMaterial( { color:0x000000 } );
     
@@ -207,7 +206,7 @@ function render(){
     
     set_heights(fluid_height_map.h, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
     water_mesh.geometry.verticesNeedUpdate = true; // Make sure Three.js know we changed the mesh
-    fluid_height_map.update( delta ); 
+    //fluid_height_map.update( delta ); 
     controls.update( delta );
     renderer.render(scene, camera);
 }
@@ -222,7 +221,7 @@ function animate (){
 
 init();
 animate();
-/*
+
 // Simulation update moved here to make it faster then 60 Hz
 setInterval(function(){ 
     if(!isPlay) return;
@@ -233,4 +232,4 @@ setInterval(function(){
     if(document.visibilityState == "visible"){
        // Performs a update of the simulation
     }
-}, 1);*/
+}, 1);
