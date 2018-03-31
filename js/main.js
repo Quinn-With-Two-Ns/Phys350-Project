@@ -11,6 +11,7 @@ var camera;
 var renderer;
 var water_mesh, ground_mesh;
 let mesh_sides = new Array(4);
+var paused = false;
 var isPlay;
 let bgSound
 var worldWidth = 100;
@@ -28,7 +29,8 @@ let sim_parameters = {
     "wave Speed": 100,
     amplitude: 3,
     "Simulation Speed": 1,
-    'reset':()=>{ fluid_height_map.reset(); }
+    'reset':()=>{ fluid_height_map.reset(); },
+    'pause':() =>{paused = !paused;}
 };
 
 
@@ -58,6 +60,8 @@ function create_Gui()
     gui.add( sim_parameters, "amplitude", -10, 10, 0.1 ).onChange( change );
     gui.add( sim_parameters, "Simulation Speed", -10, 10, 0.1 ).onChange( change );
     gui.add( sim_parameters, 'reset' );
+    gui.add( sim_parameters, 'pause' );
+    
     //
     change();
 }

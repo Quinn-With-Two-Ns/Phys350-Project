@@ -97,7 +97,6 @@ class Fluid_Height_Map {
          for (var i = 1; i < this.nx - 1; i++) {
             let h_1, h_2;
 
-            //(conditional) ?    (if true)     :    (if false)
             (v[i] <= 0) ? h_1 = n[i + 1] : h_1 = n[i];
 
             (v[i - 1] <= 0) ? h_2 = n[i] : h_2 = n[i - 1];
@@ -143,16 +142,15 @@ class Fluid_Height_Map {
     update(dt) {
         dt *= 1;
         this.time += dt;
-
-        this.n[0] = 10 + 4 * Math.sin(1 * this.time);
-
+        
+        if(!paused)this.n[0] = 10 + 4 * Math.sin(1 * this.time);
+        
         let v_copy = clone(this.v);
 
 
         //Smooth out arrays using advection
         this.n = this.advect(this.n, v_copy, dt);
         this.v = this.advect(this.v, v_copy, dt);
-
 
         //Update heights
         this.updateHeights(this.n, this.v, dt);
