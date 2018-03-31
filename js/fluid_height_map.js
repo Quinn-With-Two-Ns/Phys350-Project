@@ -50,8 +50,8 @@ class Fluid_Height_Map {
      */
     linearInterpolate(s, x) {
         // Figure out where the point is between
-        let i1 = Math.floor(x / this.dx);
-        let i2 = i1 + 1;
+        let i1 = Math.floor(x / this.dx); //find array element corresponding to position
+        let i2 = i1 + 1; // adjacent element in array
 
         let f1 = s[i1];
         let f2 = s[i2];
@@ -76,7 +76,7 @@ class Fluid_Height_Map {
             if (i == 0 || i == (this.nx - 1)) { }
             else {
                 let x0 = i * this.dx;
-                let x1 = x0 - dt * v[i];
+                let x1 = x0 + dt * v[i];
                 // Write to new state matrix
                 s_new[i] = this.linearInterpolate(s, x1);
             }
@@ -117,7 +117,6 @@ class Fluid_Height_Map {
         for (var i = 1; i < this.nx - 1; i++) {
             v[i] += this.a * ((h[i - 1] - h[i]) / this.dx) * dt;
         }
-        
     }
 
     /**
@@ -144,11 +143,8 @@ class Fluid_Height_Map {
     update(dt) {
         dt *= 1;
         this.time += dt;
-        
 
-
-        this.n[30] = 10 + 4 * Math.sin(1 * this.time);
-        
+        this.n[0] = 10 + 4 * Math.sin(1 * this.time);
 
         let v_copy = clone(this.v);
 
