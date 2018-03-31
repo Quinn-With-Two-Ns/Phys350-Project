@@ -25,7 +25,8 @@ var fluid_height_map;
 let sim_parameters = {
     "wave Speed": 100,
     amplitude: 3,
-    reset:()=>{ fluid_height_map.reset(); }
+    "Simulation Speed": 1,
+    'reset':()=>{ fluid_height_map.reset(); }
 };
 
 
@@ -41,7 +42,7 @@ function init_conditions(heights, v1, v2){
     }
 }
 
-function heightMap(heights){
+function heightMap_ramp(heights){
     for(var j = 0; j < heights.length; j++){
         for(var i = 0; i < heights[0].length; i++){
             if(i > heights.length/4){
@@ -57,9 +58,11 @@ function heightMap(heights){
 function create_Gui()
 {
     let gui = new dat.GUI();
-    let change = function(){  
+    let change = function(){
+        fluid_height_map.simulation_Speed = sim_parameters["Simulation Speed"];
     }
     gui.add( sim_parameters, "amplitude", -10, 10, 0.1 ).onChange( change );
+    gui.add( sim_parameters, "Simulation Speed", -10, 10, 0.1 ).onChange( change );
     gui.add( sim_parameters, 'reset' );
     //
     change();
@@ -71,7 +74,7 @@ function create_Gui()
 function init(){
     isPlay = true;
     // 
-    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions, heightMap);
+    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions, heightMap_ramp);
     //
     container = document.getElementById( 'container' );
     stats = new Stats(); // Gives the framerate in the top corner 
