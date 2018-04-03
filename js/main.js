@@ -17,7 +17,7 @@ var worldWidth = 100;
 var surface_width = 1000;
 var clock = new THREE.Clock();
 let render_clk = new THREE.Clock();
-
+let ground_geometry;
 var raycaster = new THREE.Raycaster();
 
 var fluid_height_map;
@@ -25,8 +25,10 @@ var fluid_height_map;
 let sim_parameters = {
     "wave Speed": 100,
     amplitude: 3,
+    frequency: 1,
     "Simulation Speed": 1,
-    'reset':()=>{ fluid_height_map.reset(); }
+    'reset':()=>{ fluid_height_map.reset(); },
+    'Ground Profile':'ramp'
 };
 
 
@@ -55,15 +57,38 @@ function heightMap_ramp(heights){
     }
 }
 
+function heightMap_flat(heights){
+    for(var j = 0; j < heights.length; j++){
+        for(var i = 0; i < heights[0].length; i++){
+            heights[j][i] = 0;
+        }
+    }
+}
+
 function create_Gui()
 {
     let gui = new dat.GUI();
     let change = function(){
         fluid_height_map.simulation_Speed = sim_parameters["Simulation Speed"];
+        fluid_height_map.frequency = sim_parameters["frequency"];
+        fluid_height_map.amplitude = sim_parameters["amplitude"];
+        
     }
-    gui.add( sim_parameters, "amplitude", -10, 10, 0.1 ).onChange( change );
+    gui.add( sim_parameters, "amplitude", 0, 10, 0.1 ).onChange( change );
+    gui.add( sim_parameters, "frequency", 0, 1.5, 0.1 ).onChange( change );
     gui.add( sim_parameters, "Simulation Speed", -10, 10, 0.1 ).onChange( change );
     gui.add( sim_parameters, 'reset' );
+    gui.add( sim_parameters, 'Ground Profile', ['flat', 'ramp']).onChange( () => {
+        if(sim_parameters["Ground Profile"] == "flat")
+        {
+            fluid_height_map.heightMap = heightMap_flat;
+        }else if(sim_parameters["Ground Profile"] == "ramp"){
+            fluid_height_map.heightMap = heightMap_ramp;
+        }
+        sim_parameters.reset();
+        set_heights(fluid_height_map.g, ground_mesh.geometry.vertices);
+        ground_mesh.geometry.verticesNeedUpdate = true;
+    });
     //
     change();
 }
@@ -136,7 +161,7 @@ function init(){
     // Create sides
 
     // Create the ground
-    var ground_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
+    ground_geometry = new THREE.PlaneGeometry( surface_width, surface_width, worldWidth, worldWidth );
     ground_geometry.rotateX( - Math.PI / 2 );
     set_heights(fluid_height_map.g, ground_geometry.vertices);
     //

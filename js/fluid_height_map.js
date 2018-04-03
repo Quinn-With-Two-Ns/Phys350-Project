@@ -27,6 +27,8 @@ class Fluid_Height_Map {
         this.dx = this.width / this.nx;
         this.dy = this.length / this.ny;
         this.simulation_Speed = 1.0;
+        this.frequency = 1.0;
+        this.amplitude = 1.0;
 
         this.heightMap = heightMap;
         this.g = createArray(nx, ny);
@@ -176,7 +178,7 @@ class Fluid_Height_Map {
         
 
         for (let k = 0; k < this.ny; k++) {
-            this.n[k][1] = 10 + 6 * Math.sin(1 * this.time);
+            this.n[k][1] = 10 + this.amplitude * Math.sin(this.frequency * this.time);
         }
 
         let v1_copy = clone(this.v1);
