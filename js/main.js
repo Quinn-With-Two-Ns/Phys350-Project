@@ -19,7 +19,7 @@ var clock = new THREE.Clock();
 let render_clk = new THREE.Clock();
 let ground_geometry;
 var raycaster = new THREE.Raycaster();
-
+let base_Height = 30;
 var fluid_height_map;
 // Simulation Parameters
 let sim_parameters = {
@@ -28,18 +28,30 @@ let sim_parameters = {
     frequency: 1,
     "Simulation Speed": 1,
     'reset':()=>{ fluid_height_map.reset(); },
-    'Ground Profile':'ramp'
+    'Ground Profile':'ramp',
+    'Initial Conditions':"flat"
 };
 
 
 
 // Initial Conditions for the Height/Velocity Map
-function init_conditions(heights, v1, v2){
+function init_conditions_flat(heights, v1, v2){
     for(var iy = 0; iy < heights.length; iy++){
         for(var ix = 0; ix < heights[0].length; ix++){
             v1[iy][ix] = 0.0;
             v2[iy][ix] = 0.0;
-            heights[iy][ix] = (10.0);
+            heights[iy][ix] = base_Height;
+        }
+    }
+}
+
+// Initial Conditions for the Height/Velocity Map
+function init_conditions_bump(heights, v1, v2){
+    for(var iy = 0; iy < heights.length; iy++){
+        for(var ix = 0; ix < heights[0].length; ix++){
+            v1[iy][ix] = 0.0;
+            v2[iy][ix] = 0.0;
+            heights[iy][ix] = base_Height*(1.0 + 1.5*Math.exp(-((heights[0].length/2 - ix)**2 + (heights.length/2 - iy)**2)/100));
         }
     }
 }
@@ -48,11 +60,19 @@ function heightMap_ramp(heights){
     for(var j = 0; j < heights.length; j++){
         for(var i = 0; i < heights[0].length; i++){
             if(i > heights.length/4){
-                heights[j][i] = 6.0*(i-heights.length/4)/heights.length;
+                heights[j][i] = base_Height*(i-heights.length/4)/heights.length;
             }
             else{
                 heights[j][i] = 0;
             }
+        }
+    }
+}
+
+function heightMap_corner(heights){
+    for(var j = 0; j < heights.length; j++){
+        for(var i = 0; i < heights[0].length; i++){
+            heights[j][i] = base_Height*(i+j)/(heights.length + heights[0].length);
         }
     }
 }
@@ -76,19 +96,31 @@ function create_Gui()
     }
     gui.add( sim_parameters, "amplitude", 0, 10, 0.1 ).onChange( change );
     gui.add( sim_parameters, "frequency", 0, 1.5, 0.1 ).onChange( change );
-    gui.add( sim_parameters, "Simulation Speed", -10, 10, 0.1 ).onChange( change );
-    gui.add( sim_parameters, 'reset' );
-    gui.add( sim_parameters, 'Ground Profile', ['flat', 'ramp']).onChange( () => {
+    gui.add( sim_parameters, "Simulation Speed", 0, 5, 0.1 ).onChange( change );
+    gui.add( sim_parameters, 'Ground Profile', ['flat', 'ramp', "corner"]).onChange( () => {
         if(sim_parameters["Ground Profile"] == "flat")
         {
             fluid_height_map.heightMap = heightMap_flat;
         }else if(sim_parameters["Ground Profile"] == "ramp"){
             fluid_height_map.heightMap = heightMap_ramp;
+        } else if(sim_parameters["Ground Profile"] == "corner"){
+            fluid_height_map.heightMap = heightMap_corner;
         }
         sim_parameters.reset();
         set_heights(fluid_height_map.g, ground_mesh.geometry.vertices);
         ground_mesh.geometry.verticesNeedUpdate = true;
     });
+
+    gui.add( sim_parameters, 'Initial Conditions', ['flat', 'bump']).onChange( () => {
+        if(sim_parameters["Initial Conditions"] == "flat")
+        {
+            fluid_height_map.initial_conditions = init_conditions_flat;
+        }else if(sim_parameters["Initial Conditions"] == "bump"){
+            fluid_height_map.initial_conditions = init_conditions_bump;
+        }
+        sim_parameters.reset();
+    });
+    gui.add( sim_parameters, 'reset' );
     //
     change();
 }
@@ -99,7 +131,7 @@ function create_Gui()
 function init(){
     isPlay = true;
     // 
-    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions, heightMap_ramp);
+    fluid_height_map = new Fluid_Height_Map(surface_width, surface_width, worldWidth, worldWidth, init_conditions_flat, heightMap_ramp, base_Height);
     //
     container = document.getElementById( 'container' );
     stats = new Stats(); // Gives the framerate in the top corner 

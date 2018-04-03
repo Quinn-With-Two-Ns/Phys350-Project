@@ -17,9 +17,10 @@ class Fluid_Height_Map {
      * @param {function} initial_conditions defines initial element values.
      * @param {function} heightMap defines ground geometry.
      */
-    constructor(width, length, nx, ny, initial_conditions, heightMap) {
+    constructor(width, length, nx, ny, initial_conditions, heightMap, base_Height) {
         this.width = width;
         this.length = length;
+        this.base_Height = base_Height;
         nx += 1;
         ny += 1;
         this.nx = nx;
@@ -178,7 +179,7 @@ class Fluid_Height_Map {
         
 
         for (let k = 0; k < this.ny; k++) {
-            this.n[k][1] = 10 + this.amplitude * Math.sin(this.frequency * this.time);
+            this.n[k][1] = this.base_Height + this.amplitude * Math.sin(this.frequency * this.time);
         }
 
         let v1_copy = clone(this.v1);
