@@ -179,11 +179,7 @@ class Fluid_Height_Map {
         
 
         for (let k = 0; k < this.ny; k++) {
-<<<<<<< HEAD
             this.n[k][1] = this.base_Height + this.amplitude * Math.sin(this.frequency * this.time);
-=======
-            this.n[k][1] = 10 + 10 * Math.sin(1 * this.time);
->>>>>>> eb04b7c59724b29a68a26c84dcfa94257eefc184
         }
 
         let v1_copy = clone(this.v1);
