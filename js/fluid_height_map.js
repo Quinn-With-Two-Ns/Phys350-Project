@@ -72,16 +72,17 @@ class Fluid_Height_Map {
     advect(s, v, dt) {
         let s_new = clone(s);
 
-        for (var i = 0; i < this.nx; i++) {
-            if (i == 0 || i == (this.nx - 1)) { }
+        for (var i = 1; i < this.nx; i++) {
+            if ( i == (this.nx - 1)) {
+
+            }
             else {
                 let x0 = i * this.dx;
                 let x1 = x0 + dt * v[i];
                 // Write to new state matrix
                 s_new[i] = this.linearInterpolate(s, x1);
             }
-        }
-        
+        }     
         return s_new;
     }
 

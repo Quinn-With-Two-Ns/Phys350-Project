@@ -14,7 +14,7 @@ let mesh_sides = new Array(4);
 var paused = false;
 var isPlay;
 let bgSound
-var worldWidth = 100;
+var worldWidth = 500;
 var worldDepth = 10;
 
 var surface_width = 100;
