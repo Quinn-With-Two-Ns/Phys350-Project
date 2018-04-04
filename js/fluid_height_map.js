@@ -19,6 +19,7 @@ class Fluid_Height_Map {
         this.length = length;
         n += 1;
         this.nx = n;
+        this.region = Math.round(this.nx * (9 / 10));
         this.dx = this.length / this.nx;
 
         this.simulation_Speed = 1.0;
@@ -37,9 +38,11 @@ class Fluid_Height_Map {
         this.initial_conditions = initial_conditions;
         initial_conditions(this.h, this.v);
         for (var i = 0; i < this.nx; i++) {
-            this.n[i] = this.h[i] - this.g[i]; 
+            this.n[i] = this.h[i] - this.g[i];
         }
     }
+
+    getRegion() {return this.region;}
 
     /**
      * Helper function used to perform bilinear interpolations.
@@ -56,7 +59,7 @@ class Fluid_Height_Map {
         let f1 = s[i1];
         let f2 = s[i2];
 
-        let n = f1 * (i2 * this.dx - x) +  f2 * (x - i1 * this.dx);
+        let n = f1 * (i2 * this.dx - x) + f2 * (x - i1 * this.dx);
         let d = (i2 - i1) * this.dx;
         return (n / d);
     }
@@ -73,7 +76,7 @@ class Fluid_Height_Map {
         let s_new = clone(s);
 
         for (var i = 1; i < this.nx; i++) {
-            if ( i == (this.nx - 1)) {
+            if (i == (this.nx - 1)) {
 
             }
             else {
@@ -82,7 +85,7 @@ class Fluid_Height_Map {
                 // Write to new state matrix
                 s_new[i] = this.linearInterpolate(s, x1);
             }
-        }     
+        }
         return s_new;
     }
 
@@ -95,14 +98,14 @@ class Fluid_Height_Map {
      */
     updateHeights(n, v, dt) {
 
-         for (var i = 1; i < this.nx - 1; i++) {
+        for (var i = 1; i < this.nx - 1; i++) {
             let h_1, h_2;
 
             (v[i] <= 0) ? h_1 = n[i + 1] : h_1 = n[i];
 
             (v[i - 1] <= 0) ? h_2 = n[i] : h_2 = n[i - 1];
 
-            n[i] -= ((h_1 * v[i + 1] - h_2 * v[i]) / this.dx ) * dt;
+            n[i] -= ((h_1 * v[i + 1] - h_2 * v[i]) / this.dx) * dt;
         }
 
     }
@@ -143,9 +146,9 @@ class Fluid_Height_Map {
     update(dt) {
         dt *= 1;
         this.time += dt;
-        
-        if(!paused)this.n[0] = 10 + 4 * Math.sin(1 * this.time);
-        
+
+        if (!paused) this.n[0] = 10 + 4 * Math.sin(1 * this.time);
+
         let v_copy = clone(this.v);
 
 
@@ -163,15 +166,31 @@ class Fluid_Height_Map {
 
         //Update velociteis
         this.updateVelocities(this.h, this.v, dt);
+
+        this.adjustBoundaries(dt);
     }
+
+    //Set region x = n-n/10
+    adjustBoundaries(dt) {
+        let sigma = 0;
+        let sigmap = sigma;
+
+        for (let i = this.region; i < this.nx; i++) {
+            sigma = Math.pow(((2*i-this.region)/this.region),3);
+
+            this.h[i] += - sigma*Math.pow((this.h[i] - worldDepth),2)*dt;
+            this.v[i] += - 0.5*(sigma+sigmap)*this.v[i]*dt;
+            sigmap = sigma;
+        }   
+    }
+
     /*
     */
-    reset()
-    {
+    reset() {
         this.heightMap(this.g);
         this.initial_conditions(this.h, this.v);
         for (var i = 0; i < this.nx; i++) {
-            this.n[i] = this.h[i] - this.g[i]; 
+            this.n[i] = this.h[i] - this.g[i];
         }
         this.time = 0;
 

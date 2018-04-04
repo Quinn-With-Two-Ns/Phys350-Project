@@ -2,7 +2,7 @@ function set_vertex( vertices, x, y, val){
     vertices[ (worldWidth+1)*y + x ].y = val;
 }
 
-function at(vertices, x, y){
+function at( vertices, x, y){
     return (vertices[ (worldDepth+1)*y + x ]).y;
 }
 
