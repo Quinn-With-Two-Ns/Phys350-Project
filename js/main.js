@@ -159,8 +159,7 @@ function init(){
         bgSound.play();
     });
     //
-    var light = new THREE.PointLight( 0xff, 1, 100 );
-    light.position.set( 50, 50, 50 );
+    light = new THREE.DirectionalLight( 0xffffff, 0.8 );
     scene.add( light );
     //
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
@@ -181,11 +180,15 @@ function init(){
     water_geometry.rotateX( - Math.PI / 2 );
     set_heights(fluid_height_map.h, water_geometry.vertices);
     
-    var water_texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+    var water_texture = new THREE.TextureLoader().load( "textures/Water-0326.jpg" );
     water_texture.wrapS = water_texture.wrapT = THREE.RepeatWrapping;
     water_texture.repeat.set( 5, 5 );
 
-    var water_material = new THREE.MeshBasicMaterial( { color: 0x0066ff, map: water_texture } );
+    var waterNM_texture = new THREE.TextureLoader().load( "textures/Water 0326normal.jpg" );
+    waterNM_texture.wrapS = waterNM_texture.wrapT = THREE.RepeatWrapping;
+    waterNM_texture.repeat.set( 5, 5 );
+
+    var water_material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatshading:true,map: water_texture, shininess:90, normalMap:waterNM_texture} );
     water_material.transparent = true;
     water_material.opacity = 0.75;
     water_mesh = new THREE.Mesh( water_geometry, water_material );
@@ -292,7 +295,7 @@ function render(){
     
     set_heights(fluid_height_map.h, water_mesh.geometry.vertices); // Syncs the height-map with the 3-D model
     water_mesh.geometry.verticesNeedUpdate = true; // Make sure Three.js know we changed the mesh
-    fluid_height_map.update( delta ); 
+    //fluid_height_map.update( delta ); 
     controls.update( delta );
     renderer.render(scene, camera);
 }
@@ -307,7 +310,7 @@ function animate (){
 
 init();
 animate();
-/*
+
 // Simulation update moved here to make it faster then 60 Hz
 setInterval(function(){ 
     if(!isPlay) return;
@@ -315,7 +318,5 @@ setInterval(function(){
     let dt = render_clk.getDelta();
     if( dt > 1/60) return;
     fluid_height_map.update( dt ); 
-    if(document.visibilityState == "visible"){
-       // Performs a update of the simulation
-    }
-}, 1);*/
+
+}, 1);
